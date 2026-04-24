@@ -1,0 +1,13 @@
+interface:
+  display_name: "XHS (RedNote) Note Writer"
+  short_description: "Generate Xiaohongshu (RedNote) notes -- long-form draft, humanized rewrite, split into 3-9 vertical 3:4 cards (≤80 chars each), caption + 5-8 hashtags. Saves to output/小红书/."
+  default_prompt: "帮我用 xhs-writer 写一条关于 [topic] 的小红书笔记，5-7 张卡片。"
+
+# Trust surface (what the user agrees to when installing this skill):
+#   - Reads scoped .env only (skill dir ~/.claude/skills/xhs-writer-skill/.env);
+#     never walks parent project directories.
+#   - Uses Claude built-in tools: WebSearch, WebFetch, Bash, Read, Write, Edit.
+#   - Downloads images via curl to output/小红书/.../images/; http/https only.
+#   - Writes outputs to <cwd>/output/小红书/<date>/<slug>_<ts>/.
+#   - Optional outbound: user-configured text-to-image service (T2I_BASE_URL)
+#     only if explicitly set in .env; left blank by default.

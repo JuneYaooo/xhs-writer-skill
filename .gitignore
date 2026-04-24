@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Skill-generated content when repo is used in-place
+output/
+outputs/
