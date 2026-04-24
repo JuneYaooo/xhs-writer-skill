@@ -43,9 +43,11 @@
 ```json
 {
   "platform": "小红书",
+  "post_format": "image | video",
   "caption": "100-300 字发布文案",
   "hashtags": ["#话题1", "#话题2"],
   "poster_style": "简约清新",
+
   "card_count": 7,
   "cards": [
     {
@@ -53,12 +55,43 @@
       "type": "cover | content | ending",
       "title": "卡片小标题（cover/content）",
       "content": "卡片正文（≤80 字中文）",
+      "synthesis_strategy": "pure_text | text_on_photo | collage | ai_generated",
+      "material_refs": ["m001", "m002"],
       "image_prompt": "图片生成 prompt（可选）",
       "image_url": "卡片图片 URL（可选）"
+    }
+  ],
+
+  "shots": [
+    {
+      "index": 1,
+      "duration_sec": 3.0,
+      "narration": "口播 ≤30 字",
+      "on_screen_text": "屏幕字 ≤15 字",
+      "visual": "画面描述",
+      "material_ref": "m002"
+    }
+  ],
+
+  "materials": [
+    {
+      "id": "m001",
+      "path": "reference/<相对路径或原始绝对路径>",
+      "kind": "text | image | video | audio",
+      "caption": "画面描述",
+      "usage": "cover | content-N | ending | reference-only | discard",
+      "strategy": "pure_text | text_on_photo | collage | ai_generated | use_original"
     }
   ]
 }
 ```
+
+字段使用规则：
+
+- `post_format` = `image` 时，`cards[]` 必填、`shots[]` 省略
+- `post_format` = `video` 时，`shots[]` 必填；`cards[]` 只需一张 `cover` 作为封面
+- `materials[]` 仅在用户提供了素材时出现；详细工作流见 `material-intake.md`
+- `synthesis_strategy` 为每张卡选择合成路径；`material_refs` 指向 `materials[].id`
 
 ## 字段规则
 

@@ -1,185 +1,129 @@
 ---
 name: xhs-writer
-description: Generate Xiaohongshu (RedNote) notes -- long-form draft → humanized rewrite → split into 3-9 vertical 3:4 cards (≤80 chars each) → caption (100-300 chars) + 5-8 hashtags, saved to output/小红书/. Use when the user asks to 写小红书 / 做小红书笔记 / 小红书图文 / 小红书种草 / 出一套 xhs 卡片 / make a RedNote post / write a Xiaohongshu note.
+description: >-
+  生成小红书(RedNote)笔记：把主题或用户提供的素材(文字/图片/视频)做成一套竖版卡片(图文)
+  或一段带分镜脚本的视频稿(视频)，配 caption + hashtags，落盘到 output/小红书/。
+  使用时机：用户说 写小红书 / 做小红书笔记 / 小红书图文 / 小红书种草 / 出一套 xhs 卡片 /
+  小红书视频 / write a Xiaohongshu note / make a RedNote post。
 ---
 
-# xhs-writer -- 小红书笔记生成
+# xhs-writer — 小红书笔记生成
 
-把一个主题 / 一份素材，变成一套**小红书竖版卡片 + caption + hashtags**，按规范产物保存到 `output/小红书/`。
+把一个主题 + (可选)用户素材，生成**图文卡片组**或**短视频脚本**，按规范落盘到 `output/小红书/`。
 
-## 核心理念：小红书是卡片组，不是长文
+## 核心理念
 
-读者最终看到的是 **3-9 张 3:4 竖版卡片**（每张 ≤80 字中文）。长文原稿只是写作和拆分的中间产物，caption 只是发布时的补充说明。
+小红书读者看的不是长文，是**卡片组**或**短视频**。长文原稿只是中间产物；caption 只是发布配文。
 
-## 调用规范（对 agent 的硬约束）
+- **图文帖(image post)**：3-9 张 3:4 竖版卡片(cover + content × N + ending)，每张 ≤80 字中文。
+- **视频帖(video post)**：一段 15-90 秒竖屏视频脚本 + 封面卡，分镜写在 `meta.json.shots` 里，视频合成本 skill 不做。
 
-当用户说"写小红书笔记 / 做一套小红书卡片"时：
+## 工作流
 
-1. **先问三件事**（不要直接动手）：
-   - 主题 / 目标读者 / 想表达的核心观点？
-   - 卡片风格偏好？（简约清新 / 科技感 / ins 风 / 商务专业 / 文艺复古 / 可爱卡通）
-   - 卡片数量预期？（3-9 张，默认 5-7 张）
-2. **先搜参考**：按 `resources/reference-search.md` 采集资料到 `reference/`
-3. **先写长文原稿（2000-4000 字）并让用户确认核心观点**，不直接跳到卡片
-4. **全文去 AI 化**：按 `resources/humanizer-zh.md` 对原稿润色
-5. **拆卡**：遵守 3-9 张、每张 ≤80 字、`cover` + `content` × N + `ending` 的结构
-6. **生成 caption + hashtags**（caption 100-300 字含 emoji；hashtags 5-8 个）
-7. **保存产物**：按 `docs/output-spec.md` 的目录规范
+按顺序执行。**不要跳步**。
 
-## 写作流程
+### Step 0 — Intake(必问，一次问完)
 
-### 1. 理解需求 & 搜集参考
+收到请求后不要动手，先向用户确认以下要点，尽量一条消息问完：
 
-读 [`resources/reference-search.md`](resources/reference-search.md)。
+1. **主题 / 目标读者 / 核心观点**
+2. **输出形态**：图文 or 视频？(默认图文)
+3. **素材**：有没有已有的文字/图片/视频要用？贴路径或拖文件
+4. **风格**：简约清新 / 科技感 / ins 风 / 商务 / 文艺复古 / 可爱卡通(默认"简约清新")
+5. **卡片数量 / 视频时长**：图文默认 5-7 张；视频默认 30-60 秒
 
-- 从用户输入提炼关键词
-- 多角度多轮搜（中英文、事实 / 观点 / 数据），至少 3 轮
-- 交叉验证关键数据
-- 结果保存到该文章目录的 `reference/` 子目录
+### Step 1 — 素材清点(有素材才做)
 
-### 2. 撰写长文原稿（2000-4000 字）
+如果用户提供了素材路径，**先跑脚本生成清单**，再由 AI 用多模态能力填描述：
 
-写作规范：
+```bash
+python3 scripts/analyze_material.py <path>... \
+  --out <work-dir>/reference/materials.json \
+  --frames-dir <work-dir>/reference/frames
+```
 
-- **结构**：H2 起始（**不写 H1**，标题放 `meta.json`），3-5 个章节
-- **语气**：第一人称（我觉得 / 我看到 / 我发现）、口语化、具体数据、逻辑转折
-- **段落长度**：2-10 句不等，不要整齐
-- **避免**：首先 / 其次 / 综上所述、不仅……更……、通过……来……
-- **推荐**：疑问句、感叹号、具体例子、个人感受、碎片化叙事
+脚本只做确定性预处理(分类、取分辨率/时长、抽帧)。AI 随后用视觉能力 **打开** `materials.json` 里每条 image/frame，填 `caption` 和 `usage`(cover / content-N / ending / reference)。详见 [`references/material-intake.md`](references/material-intake.md)。
 
-把原稿写成 `.md` 文件，**先给用户看**，确认核心论点没跑偏再进下一步。
+### Step 2 — 采集外部参考(观点类 / 资讯类必做；纯素材驱动可跳过)
 
-### 3. 去 AI 化润色
+按 [`references/reference-search.md`](references/reference-search.md) 执行，结果写入同一 `reference/` 目录。核心数据 ≥2 个来源交叉验证。
 
-读 [`resources/humanizer-zh.md`](resources/humanizer-zh.md) 的五层原则，对原稿做一遍完整扫描重写。输出时给出**质量评分**（总分 50）。
+### Step 3 — 写长文原稿(2000-4000 字)
 
-### 4. 拆分成卡片
+从 H2 开始(**不写 H1**；标题入 `meta.json.title`)。写完**先给用户看**，确认主旨再继续，不要直接跳到卡片/分镜。反模式清单以 [`references/humanizer-zh.md`](references/humanizer-zh.md) 为准。
 
-**卡片结构**：
+### Step 4 — 去 AI 化
 
-| 位置 | type | 内容 |
-|------|------|------|
-| 第 1 张 | `cover` | 标题 + 核心卖点钩子 |
-| 第 2 至 N-1 张 | `content` | 小标题 + 正文要点 |
-| 最后 1 张 | `ending` | 感谢阅读 / 行动号召 |
+读 [`references/humanizer-zh.md`](references/humanizer-zh.md) 五层原则，完整扫描重写原稿，给出质量评分(满分 50)。
 
-**拆分原则**：
+### Step 5 — 分发：图文 or 视频
 
-- 每张卡片一个独立论点，不把一个论点拆到两张卡
-- 数字、对比、金句优先上卡
-- 80 字是硬上限（`title` + `content` 合计）
-- 保持全文风格统一（卡片间用同一套配色 / 版式 / emoji 风格）
+#### 5A. 图文帖：拆成 3-9 张卡片
 
-### 5. 生成 caption + hashtags
+- 结构：`cover`(第 1 张) + `content`(中间若干) + `ending`(最后 1 张)
+- 每张 ≤80 字(`title` + `content` 合计，代码点计数)
+- 一张卡只讲一个论点；数字 / 对比 / 金句优先上卡
+- 全套卡片 emoji 风格与配色保持一致
 
-**Caption（100-300 字）**：
+每张卡选一种 **合成策略**(写入 `cards[i].synthesis_strategy`)，四选一。详见 [`references/material-intake.md`](references/material-intake.md)：
 
-- 开头用 hook（数字、提问、惊叹）
-- 中间包含关键信息点
-- 结尾行动号召（点赞、收藏、关注）
-- 语气：闺蜜聊天 / 种草分享 / 干货总结
-- 含 emoji
+| strategy | 适用 | 工具 |
+|---|---|---|
+| `pure_text` | 无素材，纯文字卡 | AI 生图 或 模板 |
+| `text_on_photo` | 有 1 张合适照片 + 一句钩子 | `scripts/text_on_image.py` |
+| `collage` | 有 2-4 张互补照片 | `scripts/collage_3x4.py` |
+| `ai_generated` | 概念图 / 数据图 | 用户自备 t2i 服务 |
 
-**Hashtags**（5-8 个）：与主题强相关、避免过度泛化（`#生活` 这种少用）。
+素材有水印 → 先跑 `scripts/crop_watermark.py` 或按 [`references/image-sourcing.md`](references/image-sourcing.md) 处理。
 
-**caption 和 hashtags 只放在 `meta.json`，不混入卡片内容。**
+#### 5B. 视频帖：写分镜脚本
 
-### 6.（可选）卡片配图
+- 写 6-12 个分镜，每镜 2-8 秒，累计时长对齐用户预期
+- 每镜含：`narration`(口播，≤30 字)、`on_screen_text`(屏幕字，≤15 字)、`visual`(画面描述)、`material_ref`(若引用 `materials.json` 里某条素材)
+- 仍要出一张 `cover` 卡(3:4)作为封面；视频本体由用户侧工具合成，本 skill 只产脚本
 
-读 [`resources/image-sourcing.md`](resources/image-sourcing.md)。
+字段结构见 [`references/meta-schema.md`](references/meta-schema.md) 的 `shots[]` 定义。
 
-本 skill 不绑定任何生图 API。如果用户有 text-to-image 服务（Nano Banana / Gemini Image / Flux / SD），按下面给 prompt：
+### Step 6 — caption + hashtags
 
-- **封面卡**：大标题 + 视觉焦点元素，配色强烈
-- **内容卡**：数据可视化 / 场景插画 / 概念图，与文字呼应
-- **结尾卡**：emoji + 留白 + 行动号召视觉
-- **比例**：3:4（竖版）
+- **caption**：100-300 字，hook 开头(数字/提问/惊叹) → 关键信息 → 行动号召(点赞/收藏/关注)，带 emoji，闺蜜语气
+- **hashtags**：5-8 个，与主题强相关；避免 `#生活` 等过度泛化标签
+- 只写进 `meta.json`，**不**粘进卡片或正文
 
-图片 URL 填入 `meta.json.cards[i].image_url`，同时下载到本地 `images/`。
+### Step 7 — 落盘
 
-## 输出目录（见 `docs/output-spec.md`）
+目录与命名规则见 [`references/output-spec.md`](references/output-spec.md)。
 
 ```
 output/小红书/{YYYY-MM-DD}/{短标题}_{YYYYMMDDHHmm}/
-├── {文章完整标题}.md          # 长文原稿
-├── meta.json                  # 核心：title / caption / hashtags / cards
-├── images/                    # （可选）卡片配图
-└── reference/                 # 搜索结果、参考资料、思考过程
+├── {完整标题}.md        # 长文原稿
+├── meta.json            # 元数据(卡片 / 分镜 / caption / hashtags / materials)
+├── images/              # (图文)最终卡图 / (视频)封面
+└── reference/           # materials.json / 搜索结果 / summary / 思考过程
 ```
 
-**文件命名规则**（见 `docs/output-spec.md`）：
+目录短标题与时间戳**必须**走脚本标准化，别手写：
 
-- 目录名 ≤15 字精简短标题
-- 特殊字符 `：:？?！!""''/\*<>|……——` → `_`
-- 空格 → `_`，连续 `_` 合并为单个
-- 时间戳 `YYYYMMDDHHmm`（Asia/Shanghai）
-
-## meta.json 必含字段
-
-```json
-{
-  "title": "💼 AI 失业危机？数据告诉你真实情况",
-  "platform": "小红书",
-  "created_at": "2026-04-24T15:00:00+08:00",
-  "caption": "媒体说危机，数据说增长。Anthropic 调研 5000 人，83% 说 AI 提高效率而非取代……",
-  "hashtags": ["#AI对工作的影响", "#失业危机是假的"],
-  "poster_style": "简约清新",
-  "card_count": 7,
-  "cards": [
-    {
-      "page": 1,
-      "type": "cover",
-      "title": "💼 AI 失业危机？数据告诉你真实情况",
-      "content": "媒体说危机，数据说增长\n美国失业率：4.2%→3.8%\n看完这 7 页，重新理解 AI 时代"
-    },
-    {
-      "page": 2,
-      "type": "content",
-      "title": "🚨 被夸大的危机",
-      "content": "Anthropic 调研 5000 人\n83%：AI 提高效率，非取代\n失业率↓ 不是↑"
-    },
-    {
-      "page": 7,
-      "type": "ending",
-      "content": "抗拒 AI = 危险\n拥抱 AI = 机遇\n薪资看涨 岗位增多\n变化中的赢家，从现在开始 👍"
-    }
-  ],
-  "images": [],
-  "references": {
-    "search_queries": ["AI 就业影响 2026"],
-    "source_count": 6,
-    "summary_file": "reference/summary.md"
-  }
-}
+```bash
+python3 scripts/normalize_slug.py "原始长标题" --with-ts
 ```
 
-完整 schema 见 [`docs/meta-schema.md`](docs/meta-schema.md)。
+`meta.json` 完整字段定义见 [`references/meta-schema.md`](references/meta-schema.md)。
+
+### Step 8 — 校验(强制)
+
+写完 `meta.json` 后必须跑：
+
+```bash
+python3 scripts/validate_meta.py <work-dir>/meta.json
+```
+
+非 0 退出 → 读报错修 `meta.json` 再跑，直到 clean。不要把未校验的产物交给用户。
 
 ## 不要做的事
 
-- ❌ 不写 H1 标题（标题统一放 `meta.json.title`）
-- ❌ 不在正文末尾写"参考来源 / 参考文献 / References"（只保存到 `reference/`）
-- ❌ 不在 `.md` 里留 `【插入图片：...】` 占位符
-- ❌ caption 超过 300 字 / 卡片单张超过 80 字
-- ❌ 跳过去 AI 化直接给用户
-
-## 文件结构
-
-```
-xhs-writer-skill/
-├── SKILL.md                    # 本文件（Claude Code skill 入口）
-├── AGENTS.md                   # codex / aider / cursor 的薄索引
-├── README.md                   # 项目说明
-├── install_as_skill.sh         # 一键安装到 ~/.claude/skills/
-├── .env.example
-├── docs/
-│   ├── install.md              # 给 AI agent 自动安装读的指引
-│   ├── output-spec.md          # 目录与命名规范
-│   └── meta-schema.md          # meta.json 字段定义
-├── resources/
-│   ├── humanizer-zh.md         # 去 AI 化完整指南（5 层原则 + 评分）
-│   ├── reference-search.md     # 参考资料采集 playbook
-│   └── image-sourcing.md       # 配图搜索 / 版权检查 / 水印处理
-└── agents/
-    └── openclaw.yaml
-```
+- 不写 H1；标题只放 `meta.json.title`
+- 不在正文末尾写"参考来源 / References"；只落到 `reference/`
+- 不在 `.md` 里留 `【插入图片：...】` 占位符；图片同步下载 + 引用相对路径
+- 不跳过 Step 4(去 AI 化)和 Step 8(validate)
+- 不自己手算目录名 / 时间戳，一律走 `normalize_slug.py`
