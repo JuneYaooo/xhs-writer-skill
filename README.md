@@ -101,7 +101,19 @@ GPT_IMAGE_MODEL_NAME=gpt-image-2
 
 装完直接跟 Claude 说人话就行：
 
-### 场景1：推广产品/项目
+### 场景1：推广产品/项目（推荐配合 social-account-doctor）
+
+> 先帮我用 social-account-doctor 找一下同类产品的爆款笔记，然后参考它们的结构，帮我推广这个项目 `/path/to/project`。
+
+Claude 会：
+1. **找对标**：搜索同类产品的爆款笔记
+2. **拆爆款**：分析标题模式、卡片结构、钩子套路
+3. **扫描素材**：你的项目截图、对比图、演示图
+4. **卖点分析**：让你打分（稀缺性×实用性×可感知）
+5. **套公式**：用爆款的结构 + 你的真实素材
+6. **输出**：6-7 张卡片 + caption + hashtags
+
+### 场景2：快速生成（不分析对标）
 
 > 帮我推广这个项目 `/path/to/project`，做一套小红书卡片。
 
@@ -112,7 +124,7 @@ Claude 会：
 4. 用图生图处理真实素材
 5. 输出 6-7 张卡片 + caption + hashtags
 
-### 场景2：好物分享
+### 场景3：好物分享
 
 > 写一条关于 XX 好物推荐的小红书笔记。
 
@@ -121,7 +133,7 @@ Claude 会：
 2. 素材盘点（产品图、使用场景图）
 3. 生成卡片（封面 + 亮点展示 + 使用场景 + 真实体验 + CTA）
 
-### 场景3：知识科普
+### 场景4：知识科普
 
 > 写一条关于 XX 知识的小红书笔记。
 
@@ -154,17 +166,34 @@ Claude 会：
 | 热点词 | `{热点词}爆火后，我用它做了{场景}` | 蹭热点、技术类产品 |
 | 身份共鸣 | `{身份标签}必备！{核心功能}` | 有明确目标人群的产品 |
 
-### 卡片结构（标准6-7张）
+### 工作流程建议
+
+**推荐流程**（结合 [social-account-doctor](https://github.com/JuneYaooo/social-account-doctor)）：
 
 ```
-01-封面.jpg      - 提问式/痛点式/发现式钩子
-02-核心卖点.jpg  - 最稀缺的功能/亮点（图生图优先）
-03-功能展示.jpg  - 辅助功能/多样性展示
-04-目标人群.jpg  - 谁最需要这个
-05-真实案例.jpg  - 社交证明/使用体验
-06-CTA.jpg       - 行动号召
-07-链接.jpg      - 开源地址/官方链接（可选）
+Step 1: 找对标爆款
+→ 用 social-account-doctor 搜索同类内容
+→ 分析爆款的钩子、结构、封面风格
+
+Step 2: 拆解爆款
+→ 提取可复用的公式（标题模式、卡片结构、文案套路）
+→ 不是照搬，是学习底层逻辑
+
+Step 3: 套自己的内容
+→ 用 xhs-writer-skill 生成初稿
+→ 应用从爆款学到的公式
+→ 保留自己的真实素材和独特卖点
+
+Step 4: 快速迭代
+→ V1 发布 → 看数据 → 优化 → V2
 ```
+
+**卡片结构**：不固定模板，根据对标爆款和内容类型灵活调整。
+
+常见结构参考：
+- 推广类：封面 + 核心卖点 + 功能展示 + 目标人群 + 真实案例 + CTA + 链接
+- 好物类：封面 + 产品亮点 + 使用场景 + 效果对比 + 购买建议 + CTA
+- 知识类：封面 + 核心概念 + 步骤拆解 + 注意事项 + 总结 + CTA
 
 详细方法论见：[`references/xiaohongshu-viral-methodology.md`](./references/xiaohongshu-viral-methodology.md)
 
@@ -184,8 +213,8 @@ output/小红书/{YYYY-MM-DD}/{短标题}_{YYYYMMDDHHmm}/
 
 ## 🙏 致谢
 
+- [social-account-doctor](https://github.com/JuneYaooo/social-account-doctor) — **推荐配合使用**。先用它找对标、拆爆款，再用本 skill 套自己的内容。完整闭环：找对标 → 拆爆款 → 套自己 → 快速迭代。
 - [gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills) — 图生图功能依赖
-- [social-account-doctor](https://github.com/JuneYaooo/social-account-doctor) — 方法论框架参考
 
 ---
 
