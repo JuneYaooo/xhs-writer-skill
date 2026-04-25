@@ -20,24 +20,33 @@ Claude Code / OpenClaw Skill。装进 agent 后，用一句自然语言生成 9:
 
 <table>
 <tr>
-<th width="50%">输入：项目真实素材</th>
+<th width="50%">输入：GitHub 项目原图</th>
 <th width="50%">输出：小红书风格卡片（9:16 竖版）</th>
 </tr>
 <tr>
-<td><img src="docs/assets/demo-comparison.jpg" width="100%" alt="对比图：模板克隆效果"></td>
-<td><img src="docs/assets/demo-styles.jpg" width="100%" alt="风格展示：10种风格"></td>
+<td><img src="docs/assets/input-github-screenshot.jpg" width="100%" alt="GitHub 原图：模板演示"></td>
+<td><img src="docs/assets/demo-comparison.jpg" width="100%" alt="小红书卡片：对比图"></td>
 </tr>
 <tr>
-<td align="center"><sub>卡片2：对比图（图生图）<br/>保留项目真实对比效果 + 小红书风格文字</sub></td>
-<td align="center"><sub>卡片3：风格展示（图生图）<br/>保留项目真实素材 + 素人感设计</sub></td>
+<td align="center"><sub>GitHub 项目截图（原始素材）</sub></td>
+<td align="center"><sub>卡片2：对比图（图生图）<br/>保留真实对比效果 + 小红书风格文字</sub></td>
+</tr>
+<tr>
+<td><img src="docs/assets/input-style-gallery.jpg" width="100%" alt="GitHub 原图：10种风格"></td>
+<td><img src="docs/assets/demo-styles.jpg" width="100%" alt="小红书卡片：风格展示"></td>
+</tr>
+<tr>
+<td align="center"><sub>GitHub 项目截图（10种风格展示）</sub></td>
+<td align="center"><sub>卡片3：风格展示（图生图）<br/>保留真实素材 + 素人感设计</sub></td>
 </tr>
 </table>
 
 **完整案例**：
 - 项目：[gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills)
+- 输入：GitHub 项目截图、README 图片、演示图
 - 输出：7张卡片（封面、对比图、风格展示、谁需要、真实案例、CTA、GitHub）
 - 方法：卖点分析（模板克隆 125分 > 10种风格 18分）→ 聚焦核心卖点
-- 素材：项目真实截图 → 图生图处理 → 保留真实感
+- 处理：图生图保留真实素材 + 叠加小红书风格文字（素人感）
 - 标题：5个选项（痛点式、提问式、发现式、热点词、身份共鸣）
 
 ---
@@ -215,13 +224,6 @@ output/小红书/{YYYY-MM-DD}/{短标题}_{YYYYMMDDHHmm}/
 ├── images/              # 最终卡图（9:16 竖版）
 └── reference/           # materials.json / 搜索结果 / 思考过程
 ```
-
----
-
-## 🙏 致谢
-
-- [social-account-doctor](https://github.com/JuneYaooo/social-account-doctor) — **推荐配合使用**。先用它找对标、拆爆款，再用本 skill 套自己的内容。完整闭环：找对标 → 拆爆款 → 套自己 → 快速迭代。
-- [gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills) — 图生图脚本参考（已集成到本项目）
 
 ---
 
