@@ -156,8 +156,6 @@ Style:
 2. 降低图片分辨率（max 1024px）
 3. 改用代码叠加文字（`scripts/text_on_image.py`）
 
-**参考案例**：推广 gpt-image2-ppt-skills 项目（7张卡片，图生图处理对比图和风格展示）
-
 ### Step 5 — 分发：图文 or 视频
 
 #### 5A. 图文帖：拆成 3-9 张卡片
