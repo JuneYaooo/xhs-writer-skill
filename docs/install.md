@@ -33,21 +33,13 @@ ls -la ~/.claude/skills/xhs-writer-skill/SKILL.md
 
 ---
 
-## 可选：图生图功能
+## 配置（可选）
 
-如果需要图生图功能（推荐），需要额外安装 gpt-image2-ppt-skills：
-
-```bash
-git clone https://github.com/JuneYaooo/gpt-image2-ppt-skills.git ~/.claude/skills/gpt-image2-ppt-skills
-cd ~/.claude/skills/gpt-image2-ppt-skills
-bash install_as_skill.sh
-```
-
-然后配置 OpenAI API key：
+如果需要图生图功能（推荐），配置 OpenAI API key：
 
 ```bash
 # 创建 .env 文件
-cat > ~/.claude/skills/gpt-image2-ppt-skills/.env << 'EOF'
+cat > ~/.claude/skills/xhs-writer-skill/.env << 'EOF'
 OPENAI_BASE_URL=https://api.openai.com
 OPENAI_API_KEY=sk-your-key-here
 GPT_IMAGE_MODEL_NAME=gpt-image-2
@@ -56,6 +48,8 @@ EOF
 ```
 
 **重要**：需要向用户询问 OpenAI API key，不要自己编造。
+
+没有 API key 也能用，会生成纯文字卡片。
 
 ---
 
@@ -85,9 +79,9 @@ Claude 会自动调用 xhs-writer-skill 完成任务。
 
 ### 问题2：图生图失败
 
-**原因**：未安装 gpt-image2-ppt-skills 或未配置 API key
+**原因**：未配置 OpenAI API key
 
-**解决**：按上面"可选：图生图功能"步骤安装
+**解决**：按上面"配置（可选）"步骤配置 API key
 
 ### 问题3：权限错误
 

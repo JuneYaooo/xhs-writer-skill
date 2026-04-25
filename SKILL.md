@@ -119,8 +119,9 @@ python3 scripts/analyze_material.py <path>... \
 
 **执行**：
 ```python
-# 使用 gpt-image2-ppt-skills 的 image_generator
-sys.path.insert(0, '/home/ubuntu/github/gpt-image2-ppt-skills/scripts')
+# 使用本项目的 image_generator
+import sys
+sys.path.insert(0, '~/.claude/skills/xhs-writer-skill/scripts')
 from image_generator import GptImage2Generator
 
 generator = GptImage2Generator(aspect_ratio="9:16")
@@ -155,7 +156,7 @@ Style:
 2. 降低图片分辨率（max 1024px）
 3. 改用代码叠加文字（`scripts/text_on_image.py`）
 
-**参考案例**：`references/case-gpt-image2-ppt.md` 第5节
+**参考案例**：推广 gpt-image2-ppt-skills 项目（7张卡片，图生图处理对比图和风格展示）
 
 ### Step 5 — 分发：图文 or 视频
 
@@ -266,17 +267,17 @@ python3 scripts/validate_meta.py <work-dir>/meta.json
 ### 必需工具
 - Python 3.8+
 - PIL (Pillow)
-- OpenAI API key（用于图生图）
 
 ### 可选工具
-- gpt-image2-ppt-skills（图生图功能）
-  - 安装：`git clone https://github.com/JuneYaooo/gpt-image2-ppt-skills.git`
-  - 配置：复制 `.env.example` 为 `.env`，填入 `OPENAI_API_KEY`
+- OpenAI API key（用于图生图，推荐）
+  - 配置：在 `~/.claude/skills/xhs-writer-skill/.env` 填入 `OPENAI_API_KEY`
+  - 没有 API key 也能用，会生成纯文字卡片
 
 ### 图生图使用
 ```python
 # 添加路径
-sys.path.insert(0, '/home/ubuntu/github/gpt-image2-ppt-skills/scripts')
+import sys
+sys.path.insert(0, '~/.claude/skills/xhs-writer-skill/scripts')
 from image_generator import GptImage2Generator
 
 # 初始化

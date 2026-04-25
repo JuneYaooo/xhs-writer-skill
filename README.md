@@ -14,22 +14,31 @@ Claude Code / OpenClaw Skill。装进 agent 后，用一句自然语言生成 9:
 
 ---
 
-## 🎬 效果演示：真实素材 + 图生图
+## 🎬 效果演示：真实案例
+
+**案例**：推广 gpt-image2-ppt-skills 开源项目
 
 <table>
 <tr>
-<th width="50%">输入：项目真实素材（对比图/演示图）</th>
+<th width="50%">输入：项目真实素材</th>
 <th width="50%">输出：小红书风格卡片（9:16 竖版）</th>
 </tr>
 <tr>
-<td><img src="docs/assets/demo-input.jpg" width="100%" alt="input material"></td>
-<td><img src="docs/assets/demo-output.jpg" width="100%" alt="generated card"></td>
+<td><img src="docs/assets/demo-comparison.jpg" width="100%" alt="对比图：模板克隆效果"></td>
+<td><img src="docs/assets/demo-styles.jpg" width="100%" alt="风格展示：10种风格"></td>
 </tr>
 <tr>
-<td align="center"><sub>原始素材（项目截图/对比图）</sub></td>
-<td align="center"><sub>保留真实感 + 叠加小红书风格文字（素人感设计）</sub></td>
+<td align="center"><sub>卡片2：对比图（图生图）<br/>保留项目真实对比效果 + 小红书风格文字</sub></td>
+<td align="center"><sub>卡片3：风格展示（图生图）<br/>保留项目真实素材 + 素人感设计</sub></td>
 </tr>
 </table>
+
+**完整案例**：
+- 项目：[gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills)
+- 输出：7张卡片（封面、对比图、风格展示、谁需要、真实案例、CTA、GitHub）
+- 方法：卖点分析（模板克隆 125分 > 10种风格 18分）→ 聚焦核心卖点
+- 素材：项目真实截图 → 图生图处理 → 保留真实感
+- 标题：5个选项（痛点式、提问式、发现式、热点词、身份共鸣）
 
 ---
 
@@ -75,25 +84,23 @@ bash install_as_skill.sh
 
 脚本会把 skill 装到 `~/.claude/skills/xhs-writer-skill/`，Claude Code 重启后自动识别。
 
-### 可选：图生图功能
+### 配置（可选）
 
-如果需要图生图功能（推荐），需要额外安装 gpt-image2-ppt-skills：
+如果需要图生图功能（推荐），配置 OpenAI API key：
 
 ```bash
-git clone https://github.com/JuneYaooo/gpt-image2-ppt-skills.git
-cd gpt-image2-ppt-skills
-bash install_as_skill.sh
-
-# 配置 OpenAI API key
-# ~/.claude/skills/gpt-image2-ppt-skills/.env
+# 创建 .env 文件
+cat > ~/.claude/skills/xhs-writer-skill/.env << 'EOF'
 OPENAI_BASE_URL=https://api.openai.com
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-your-key-here
 GPT_IMAGE_MODEL_NAME=gpt-image-2
+GPT_IMAGE_QUALITY=high
+EOF
 ```
 
 > 🔒 **不会误吃密钥**：只从 skill 自己目录的 `.env` 加载。
 >
-> 💡 **图生图 vs 纯 AI 生图**：有真实素材时，图生图效果远超纯 AI 生图（保留真实感）。
+> 💡 **图生图 vs 纯文字卡片**：有真实素材时，图生图效果远超纯 AI 生图（保留真实感）。没有 API key 也能用，会生成纯文字卡片。
 
 ---
 
@@ -214,7 +221,7 @@ output/小红书/{YYYY-MM-DD}/{短标题}_{YYYYMMDDHHmm}/
 ## 🙏 致谢
 
 - [social-account-doctor](https://github.com/JuneYaooo/social-account-doctor) — **推荐配合使用**。先用它找对标、拆爆款，再用本 skill 套自己的内容。完整闭环：找对标 → 拆爆款 → 套自己 → 快速迭代。
-- [gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills) — 图生图功能依赖
+- [gpt-image2-ppt-skills](https://github.com/JuneYaooo/gpt-image2-ppt-skills) — 图生图脚本参考（已集成到本项目）
 
 ---
 
